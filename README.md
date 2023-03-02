@@ -1,4 +1,4 @@
 # My Docker Compose Templates
 
 - Portainer
-- Nignx Proxy Manager
+- Nginx Proxy Manager
