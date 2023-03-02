@@ -5,7 +5,7 @@ services:
         container_name: portainer
         restart: unless-stopped
         networks:
-            - nginxproxymanager_default
+            - ${NETWORK_NAME}
         ports:
             - '${PORTS}:9000'
         volumes:
@@ -13,5 +13,5 @@ services:
             - ${HOME_DIR}/data:/data
 
 networks:
-    nginxproxymanager_default:
+    ${NETWORK_NAME}:
         external: true
