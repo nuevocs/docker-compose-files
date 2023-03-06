@@ -123,6 +123,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+.env
 .env.toml
 focalboard/.env
 .venv
