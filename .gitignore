@@ -124,7 +124,7 @@ celerybeat.pid
 
 # Environments
 .env.toml
-.env
+focalboard/.env
 .venv
 env/
 venv/

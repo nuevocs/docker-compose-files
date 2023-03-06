@@ -1,0 +1,15 @@
+version: "3.0"
+services:
+  memos:
+    image: neosmemo/memos:latest
+    container_name: memos
+    volumes:
+      - ${PWD}/.memos/:/var/opt/memos
+    ports:
+      - ${PORTS}:5230
+    networks:
+      - default_network
+
+networks:
+    default_network:
+        external: true
