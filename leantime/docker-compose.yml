@@ -1,0 +1,43 @@
+version: '3.3'
+
+services:
+  leantime_db:
+    image: mysql:8.0
+    container_name: leantime_db
+    volumes:
+      - ${PWD}/db_data:/var/lib/mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_RT_PASSWD}'
+      MYSQL_DATABASE: '${DB_NAME}'
+      MYSQL_USER: '${DB_USER}'
+      MYSQL_PASSWORD: '${DB_PASSWD}'
+    command: --character-set-server=utf8 --collation-server=utf8_unicode_ci
+
+  leantime:
+    image: leantime/leantime:latest
+    container_name: leantime
+    restart: unless-stopped
+    environment:
+      # LEAN_APP_URL: 'https://domain.com/leantime'                     # Only needed for subdirectory setup; protocol (http or https) and base URL , trailing slash not needed
+      LEAN_SITENAME: '${SITE_NAME}'                                         # Name of your site, can be changed later
+      LEAN_DB_HOST: 'leantime_db'                                    # Database host, derived from container_name in leantime_db container
+      LEAN_DB_USER: '${DB_USER}'
+      LEAN_DB_PASSWORD: '${DB_PASSWD}'
+      LEAN_DB_DATABASE: '${DB_NAME}'
+      LEAN_DEFAULT_TIMEZONE: '${TIME_ZONE}'                         # Set default server timezone
+      LEAN_SESSION_PASSWORD: '${SESSION_PASSWD}'         # Salting sessions. Replace with a strong password
+      LEAN_SESSION_EXPIRATION: 28800                                    # How many seconds after inactivity should we logout?  28800seconds = 8hours
+    volumes:
+      - ${PWD}/public_userfiles:/var/www/html/public/userfiles
+      - ${PWD}/userfiles:/var/www/html/userfiles
+      - ${PWD}/config:/var/www/html/config
+    ports:
+      - "${PORTS}:80"                                                       # The port to expose and access Leantime
+    depends_on:
+      - leantime_db                                                     # Don't start Leantime unless leantime_db is running
+
+volumes:
+  db_data:
+  userfiles:
+  public_userfiles:
