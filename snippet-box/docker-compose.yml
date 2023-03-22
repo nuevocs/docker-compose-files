@@ -1,0 +1,16 @@
+version: '3'
+services:
+  snippet-box:
+    image: pawelmalak/snippet-box:latest
+    container_name: snippet-box
+    volumes:
+      - /home/docker/snippetbox:/app/data
+    ports:
+      - 5000:5000
+    networks:
+      - nginxproxymanager_default
+    restart: unless-stopped
+
+networks:
+  nginxproxymanager_default:
+    external: true

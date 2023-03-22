@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+  db:
+    image: mariadb:10
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${RTPASSWD}
+      MYSQL_USER: vikunja
+      MYSQL_PASSWORD: ${PASSWD}
+      MYSQL_DATABASE: vikunja
+    volumes:
+      - /home/docker/vikunja/db:/var/lib/mysql
+    restart: unless-stopped
+    networks:
+      - nginxproxymanager_default
+  api:
+    image: vikunja/api
+    environment:
+      PUID: 1000 # set once deployed
+      PGID: 1000 # set once deployed
+      VIKUNJA_SERVICE_TIMEZONE: Asia/Tokyo # set once deployed
+      VIKUNJA_DATABASE_HOST: db
+      VIKUNJA_DATABASE_PASSWORD: ${PASSWD}
+      VIKUNJA_DATABASE_TYPE: mysql
+      VIKUNJA_DATABASE_USER: vikunja
+      VIKUNJA_DATABASE_DATABASE: vikunja
+      VIKUNJA_SERVICE_ENABLEREGISTRATION: false # make it false once deployed
+      VIKUNJA_SERVICE_JWTSECRET: ${JWTSECRET}
+    networks:
+      - nginxproxymanager_default
+    volumes:
+      - /home/docker/vikunja/files:/app/vikunja/files
+    depends_on:
+      - db
+    restart: unless-stopped
+  frontend:
+    image: vikunja/frontend
+    restart: unless-stopped
+    networks:
+      - nginxproxymanager_default
+  proxy:
+    image: nginx
+    ports:
+      - 80:80
+    volumes:
+      - /home/docker/vikunja/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - api
+      - frontend
+    restart: unless-stopped
+    networks:
+      - nginxproxymanager_default
+networks:
+  nginxproxymanager_default:
+    external: true
